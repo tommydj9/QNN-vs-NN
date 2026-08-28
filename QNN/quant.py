@@ -29,11 +29,13 @@ class QuantumNeuralNetwork:
 
         qml.RY(weights[0], wires=0)  #Next, we apply a rotation gate to qubit 0 using the first weight parameter. This allows the circuit to learn from the input data.
         qml.RY(weights[1], wires=1)  #Then we apply a rotation gate to qubit 1 using the second weight parameter. This allows the circuit to learn from the input data.
-
-        return qml.expval(qml.PauliZ(0))  #Finally, we measure the expectation value of the Pauli-Z operator on qubit 0. This gives us a classical output that can be used for further processing.
+ 
+        return (qml.expval(qml.PauliZ(0)) + 1) / 2  #Finally, we measure the expectation value of the Pauli-Z operator on qubit 0. We standardize the output to be in the range [0, 1] by adding 1 and dividing by 2. This allows us to compare the output of the circuit with the target value during training.
 
         # You take the value in the quantum system and tranform it back to classical numeration using PAULI_Z
         # the with expval you check the expected value of that pauli_z operator in the long run.
+
+        ##This value states between +-1, so either we standirdize it into a 0-1 range or we use it as it is, depending on the problem we are trying to solve.
 
 
     def train(self, x, y):
@@ -46,4 +48,32 @@ class QuantumNeuralNetwork:
             )
 
     
-        
+
+
+## I cannot entangle 4 qubits togheter just using 1 CNOT gate, CNOT is a 2 qubit gate, 
+# so I need to use more CNOT gates to entangle all the qubits together. 
+# For example, I can use 3 CNOT gates to entangle 4 qubits together. 
+# The first CNOT gate will entangle qubit 0 and qubit 1, the second CNOT gate will entangle qubit 1 and qubit 2,
+# and the third CNOT gate will entangle qubit 2 and qubit 3. This way, all the qubits will be entangled together.
+# THAT"S CALLED ENTTANGLING LAYER, and it is a common technique used in quantum circuits to create entanglement between multiple qubits.
+
+
+# But the more your circuit-depth grows the more noise you will have in your circuit, the more difficult the optimization will be, 
+# and the more difficult it will be to train your quantum neural network.
+# Landscape flattens out almost everywhere, 
+# so your optimizer gets no signal about which way to move the weights and training stalls, 
+# that's an open problem in quantum machine learning, and it is called barren plateaus.
+
+
+# Another constraint: for every qubit you add to your circuit(feature), the number of parameters you need to optimize grows exponentially,
+# every time the optimizer has to walk trough the whole vector. Let's suppose you have N qubits:
+# every single step inside the training the optimizer has to walk trough a vector of size 2^N, 
+# and that is a problem because the more qubits you add the more parameters you have to optimize, 
+# and the more difficult it will be to train your quantum neural network. That's the real wall of quantum machine learning, and it is called the curse of dimensionality.
+
+
+## Pauli_Z operator is a quantum operator that tells you "is this qubit 0 or 1?" 
+# but reports the answer as +1 or −1 rather than as 0 or 1
+# it simply does the exp_value = 1 * (probability of measuring 0) -1 * (probability of measuring 1)
+# you'll get a value between -1 and 1, like 0.08, but my target lives in [0 ,1], so I need to standardize it to be in the same range as my target, 
+# and I can do that by using the formula: (exp_value + 1) / 2
