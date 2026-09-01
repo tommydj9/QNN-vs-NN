@@ -46,6 +46,9 @@ def train_nn(seed=0, epochs=200, lr=0.01, hidden_size=8):
     loss_fn = nn.BCEWithLogitsLoss() ## This tells us how much we are wrong
     optimizer = torch.optim.Adam(model.parameters(), lr=lr) ## This moves the weight in that direction buy a small fraction
 
+
+    best_val_loss = float("inf")
+
     # ----- 4. THE TRAINING LOOP (the ceremony — identical for the QNN later) -----
     for epoch in range(epochs): ## I repeat the loss and opt pipeline epoch times
         model.train()
@@ -66,6 +69,12 @@ def train_nn(seed=0, epochs=200, lr=0.01, hidden_size=8):
                 val_acc = (val_pred == yva).float().mean()
             print(f"epoch {epoch:3d} | train_loss {loss.item():.4f} "
                   f"| val_loss {val_loss.item():.4f} | val_acc {val_acc.item():.3f}")
+
+
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
+            torch.save(model.state_dict(), "models/nn_AAPL_best.pt")
+
 
     return model
 

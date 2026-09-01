@@ -28,7 +28,7 @@ def load_scaler(ticker = "AAPL", data_dir = "data"):
 
     X_train, Y_train = train_data[feats_cols], train_data["target"]
     X_val, Y_val = val_data[feats_cols], val_data["target"]
-    X_test, Y_test = test_data[feats_cols], val_data["target"]
+    X_test, Y_test = test_data[feats_cols], test_data["target"]
 
     scaler = StandardScaler()
 
