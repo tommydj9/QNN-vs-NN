@@ -18,8 +18,11 @@ from sklearn.metrics import (
 
 from scaler import load_scaler            # NN/scaler.py  (NOT NN.py)
 from angle_scaler import load_angle_scaler   # QNN/angle_scaler.py  (NOT QNN.py)
-from NN import ClassicalNN                    # NN/NN.py
+from NN import ClassicalNN, train_nn                    # NN/NN.py
 from QNN import QuantumNN                      # QNN/QNN.py
+from train_QNN import train_qnn
+
+
 
 def evaluate_model(model, X_test, y_test, name):
     """Run one frozen model on the SEALED test set. Called ONCE, at the end."""
@@ -49,6 +52,30 @@ def evaluate_model(model, X_test, y_test, name):
     return metrics
 
 
+def nn_shuffle_seeds(seeds, feats, target):
+    results = []
+    roc_auc = []
+    for s in seeds:
+        model = train_nn(s)
+        m = evaluate_model(model, feats, target, f"NN seed {s}")
+        results.append(m["accuracy"])
+        roc_auc.append(m["roc_auc"])
+    return np.mean(results), np.std(results), np.mean(roc_auc), np.std(roc_auc)
+
+def qnn_shuffle_seeds(seeds, feats, target):
+    results = []
+    roc_auc = []
+    for s in seeds:
+        model = train_qnn(s)
+        m = evaluate_model(model, feats, target, f"QNN seed {s}")
+        results.append(m["accuracy"])
+        roc_auc.append(m["roc_auc"])
+    return np.mean(results), np.std(results), np.mean(roc_auc), np.std(roc_auc)
+
+    
+
+    
+
 if __name__ == "__main__":
     # ---- NN on its standard-scaled test set ----
     Xtr_s, Xva_s, Xte_s, ytr, yva, yte, _ = load_scaler()
@@ -56,8 +83,19 @@ if __name__ == "__main__":
     nn_model.load_state_dict(torch.load(ROOT / "models" / "nn_AAPL_best.pt"))
     evaluate_model(nn_model, Xte_s, yte, "Classical NN")
 
+
+    print(f"\n Mean Metrics of NN model based on different seeds")
+    nn_mean, nn_std, nn_roc, nn_roc_std = nn_shuffle_seeds(list(range(10)), Xte_s, yte)
+    print(f"MEAN ACC: {nn_mean*100:.2f}%, STD: +-{nn_std*100:.2f}, MEAN ROC-AUC: {nn_roc*100:.2f}%, STD: +-{nn_roc_std*100:.2f}")
+
+
     # ---- QNN on its angle-scaled test set ----
     Xtr_a, Xva_a, Xte_a, ytr_a, yva_a, yte_a, _ = load_angle_scaler()
     qnn_model = QuantumNN()
     qnn_model.load_state_dict(torch.load(ROOT / "models" / "qnn_AAPL_best.pt"))
     evaluate_model(qnn_model, Xte_a, yte_a, "Quantum NN")
+
+    print(f"\n Mean Metrics of QNN model based on different seeds")
+    qnn_mean, qnn_std, qnn_roc, qnn_roc_std = qnn_shuffle_seeds(list(range(10)), Xte_a, yte_a)
+    print(f"MEAN ACC: {qnn_mean*100:.2f}%, STD: +-{qnn_std*100:.2f}MEAN ROC-AUC: {qnn_roc*100:.2f}%, STD: +-{qnn_roc_std*100:.2f}")
+

@@ -6,7 +6,7 @@ from QNN import QuantumNN
 from angle_scaler import load_angle_scaler
 
 
-def train_qnn(seed = 0, epochs = 200, lr = 0.01):
+def train_qnn(seed, epochs = 200, lr = 0.01):
 
     torch.manual_seed(seed)
     np.random.seed(seed)
@@ -57,11 +57,12 @@ def train_qnn(seed = 0, epochs = 200, lr = 0.01):
             print(f"epoch {epoch:3d} | train_loss {loss.item():.4f} "
                   f"| val_loss {val_loss.item():.4f} | val_acc {val_acc.item():.3f} "
                   f"| pred_rate {pred_rate.item():.2f}")
-
+            
+    model.load_state_dict(torch.load("models/qnn_AAPL_best.pt"))
     return model
 
 
 if __name__ == "__main__":
     import os
     os.makedirs("models", exist_ok=True)
-    train_qnn()
+    train_qnn(seed=0)

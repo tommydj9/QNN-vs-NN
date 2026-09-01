@@ -25,7 +25,7 @@ class ClassicalNN(nn.Module):
         return self.net(x)   # returns the logit, not the probability. It's the first step
 
 
-def train_nn(seed=0, epochs=200, lr=0.01, hidden_size=8):
+def train_nn(seed, epochs=200, lr=0.01, hidden_size=8):
     torch.manual_seed(seed)   # reproducibility (§14)
 
     # ----- 2. DATA (scaled, fit on train only — already done in your scaler) -----
@@ -75,9 +75,9 @@ def train_nn(seed=0, epochs=200, lr=0.01, hidden_size=8):
             best_val_loss = val_loss
             torch.save(model.state_dict(), "models/nn_AAPL_best.pt")
 
-
-    return model
+    model.load_state_dict(torch.load("models/nn_AAPL_best.pt"))
+    return model ## Return the best model, not the last one in the epoch
 
 
 if __name__ == "__main__":
-    train_nn()
+    train_nn(seed=0)

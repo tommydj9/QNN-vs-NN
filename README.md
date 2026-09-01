@@ -53,8 +53,19 @@ features (return, volatility, momentum, volume z-score):
 
 | Model        | Accuracy | ROC-AUC | Brier | pred_rate | Verdict            |
 |--------------|----------|---------|-------|-----------|--------------------|
-| Classical NN | 0.494    | 0.515   | 0.253 | 0.25      | chance             |
-| Quantum NN   | 0.577    | 0.473   | 0.244 | 0.97      | chance (collapsed) |
+| Classical NN | 49.4%    | 51%   | 25.3% | 25%      | chance             |
+| Quantum NN   | 57.7%    | 47.3%   | 24.4% | 97%      | chance (collapsed) |
+
+
+## Results on multiple seeds
+
+On AAPL weekly data, predicting next-week direction from four technical
+features (return, volatility, momentum, volume z-score):
+
+| Model        | Mean-Accuracy | std-deviation | Mean Roc-AUC |  ROC_AUC std          | Seeds |
+|--------------|----------|---------|-------|-----------|--------------------|
+| Classical NN | 52.5%    | +-5.16   | 49% |+-3.61     | 10        |
+| Quantum NN   | 47%    | +-6.74   | 48% | +-2.45 | 10 |
 
 **No measurable quantum advantage.** Read carefully, because this table contains
 the whole lesson:
