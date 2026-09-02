@@ -59,8 +59,8 @@ features (return, volatility, momentum, volume z-score):
 
 ## Results on multiple seeds
 
-On AAPL weekly data, predicting next-week direction from four technical
-features (return, volatility, momentum, volume z-score):
+
+Testing my neural newtworks with different seeds(10) every seed starts with a random set of weights, we calculate the mean and the std dev of the metrics:
 
 | Model        | Mean-Accuracy | std-deviation | Mean Roc-AUC |  ROC_AUC std          | Seeds |
 |--------------|----------|---------|-------|-----------|--------------------|
